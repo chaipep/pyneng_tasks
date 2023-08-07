@@ -64,3 +64,30 @@ def ignore_command(command, ignore):
         if word in command:
             ignore_status = True
     return ignore_status
+
+
+def convert_config_to_dict(config_filename):
+    with open(config_filename) as file:
+        voc_commands = {}
+        key = ''
+        for string in file:
+            ignore_string = False
+            string = string.strip('\n')
+            if not string.startswith('!') and string != '':
+                commands = string.split()
+                for string_com in commands:
+                    if ignore_command(string_com, ignore):
+                        ignore_string = True
+                        break
+                    else:
+                        continue
+                if not ignore_string:
+                    if not string.startswith(' '):
+                        key = string
+                        voc_commands[key] = []
+                    else:
+                        voc_commands[key].append(string.strip())
+    return voc_commands
+
+
+print(convert_config_to_dict('/home/yudkinds/tools/pyneng_tasks/exercises/09_functions/config_sw1.txt'))

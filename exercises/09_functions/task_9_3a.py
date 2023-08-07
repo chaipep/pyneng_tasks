@@ -25,3 +25,39 @@
 
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 """
+
+
+def get_int_vlan_map(config_filename):
+    access = {}
+    trunk = {}
+    key = None
+    value = None
+    mode = None
+    with open(config_filename) as file:
+        for string in file:
+            if 'FastEthernet' in string:
+                key = string.split()[-1]
+            elif 'vlan' in string:
+                value = string.split()[-1].split(',')
+            elif 'access' in string:
+                mode = 'access'
+            elif 'trunk' in string:
+                mode = 'trunk'
+            elif 'duplex' in string and mode is not None:
+                if mode == 'access':
+                    if value is not None:
+                        access[key] = int(''.join(value))
+                    else:
+                        access[key] = 1
+                elif mode == 'trunk':
+                    vlans = list(map(int, value))
+                    trunk[key] = vlans
+                key = None
+                value = None
+                mode = None
+    return access, trunk
+
+
+list1, list2 = get_int_vlan_map('/home/yudkinds/tools/pyneng_tasks/exercises/09_functions/config_sw2.txt')
+print(list1)
+print(list2)

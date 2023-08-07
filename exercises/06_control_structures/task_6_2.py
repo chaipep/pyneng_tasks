@@ -12,3 +12,18 @@
 
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 """
+
+ip = input('Введите ip адрес: ')
+if ip == '0.0.0.0':
+    print('unassigned')
+elif ip == '255.255.255.255':
+    print('local broadcast')
+else:
+    ip = ip.split('.')
+    oct1 = int(ip[0])
+    if oct1 > 0 and oct1 < 224:
+        print('unicast')
+    elif oct1 > 223 and oct1 < 240:
+        print('multicast')
+    else:
+        print('unused')

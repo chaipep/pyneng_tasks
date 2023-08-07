@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from operator import itemgetter
 """
 Задание 17.4
 
@@ -40,7 +41,7 @@ C-3PO,c3po@gmail.com,16/12/2019 17:24
 Функции convert_str_to_datetime и convert_datetime_to_str использовать не обязательно.
 
 """
-
+import csv
 import datetime
 
 
@@ -56,3 +57,36 @@ def convert_datetime_to_str(datetime_obj):
     Конвертирует строку с датой в формате 11/10/2019 14:05 в объект datetime.
     """
     return datetime.datetime.strftime(datetime_obj, "%d/%m/%Y %H:%M")
+
+
+def write_last_log_to_csv(source_log, output_log):
+    log = {}
+    s_log = {}
+    new_log = []
+    mails = []
+    with open(source_log) as source_file:
+        reader = csv.reader(source_file)
+        headers = next(reader)
+        new_log.append(headers)
+        for string in reader:
+            log[convert_str_to_datetime(string[2])] = string
+    list_log = sorted(log.items(), reverse=True)
+    for i in list_log:
+        s_log[i[0]] = i[1]
+    print(log)
+    print(list_log)
+    print(s_log)
+    for string2 in s_log.values():
+        if string2[1] not in mails:
+            new_log.append(string2)
+            mails.append(string2[1])
+    new_log.reverse()
+    print(new_log)
+    with open(output_log, 'w') as out_file:
+        writer = csv.writer(out_file)
+        for row in new_log:
+            writer.writerow(row)
+
+
+if __name__ == "__main__":
+    write_last_log_to_csv('mail_log.csv', 'last_change_username_mail_log.csv')

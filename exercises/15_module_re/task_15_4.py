@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 """
 Задание 15.4
 
@@ -24,3 +25,21 @@ interface Loopback0
 
 Проверить работу функции на примере файла config_r1.txt.
 """
+
+
+def get_ints_without_description(cfg_file):
+    with open(cfg_file, 'r') as file:
+        result = []
+        ifwithdes = []
+        ifall = []
+        for line in file:
+            if line.startswith('interface'):
+                inter = re.search(r'(\S+)$', line).group()
+                ifall.append(inter)
+            if line.startswith(' description'):
+                ifwithdes.append(inter)
+        result = [int for int in ifall if int not in ifwithdes]
+    return result
+
+
+print(get_ints_without_description('config_r1.txt'))

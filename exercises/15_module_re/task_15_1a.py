@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 """
 Задание 15.1a
 
@@ -24,3 +25,18 @@
 а не ввод пользователя.
 
 """
+
+
+def get_ip_from_cfg(cfg_file):
+    with open(cfg_file, 'r') as file:
+        result = {}
+        for line in file:
+            if line.startswith('interface'):
+                inter = re.search(r'(\S+)$', line)
+            if line.startswith(' ip address'):
+                ipaddr = re.search(r'(\d+\.\d+\.\d+\.\d+)\s+(\d+\.\d+\.\d+\.\d+)', line)
+                result[inter.group()] = ipaddr.groups()
+    return result
+
+
+print(get_ip_from_cfg('config_r1.txt'))

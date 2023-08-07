@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import yaml
+from task_17_3 import parse_sh_cdp_neighbors
 """
 Задание 17.3a
 
@@ -36,3 +38,26 @@
 в файл topology.yaml. Он понадобится в следующем задании.
 
 """
+
+
+def generate_topology_from_cdp(list_of_files, save_to_filename=None):
+    cdp = {}
+    for file in list_of_files:
+        with open(file, 'r') as f:
+            cdp_ne = f.read()
+            cdp.update(parse_sh_cdp_neighbors(cdp_ne))
+    if save_to_filename is not None:
+        with open(save_to_filename, 'w') as save:
+            yaml.dump(cdp, save)
+    return cdp
+
+
+if __name__ == "__main__":
+    files = ['sh_cdp_n_sw1.txt',
+             'sh_cdp_n_r1.txt',
+             'sh_cdp_n_r2.txt',
+             'sh_cdp_n_r3.txt',
+             'sh_cdp_n_r4.txt',
+             'sh_cdp_n_r5.txt',
+             'sh_cdp_n_r6.txt']
+    generate_topology_from_cdp(files, 'topology.yaml')

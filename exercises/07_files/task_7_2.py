@@ -39,3 +39,8 @@ interface Ethernet0/3
 ...
 
 """
+
+with open('/home/yudkinds/tools/pyneng_tasks/exercises/07_files/config_sw1.txt', 'r') as config:
+    for string in config:
+        if '!' not in string:
+            print(string.strip('\n'))

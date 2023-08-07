@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from task_11_1 import parse_cdp_neighbors
+from task_11_2 import create_network_map
+from draw_network_graph import draw_topology
+import graphviz
 """
 Задание 11.2a
 
@@ -80,3 +84,19 @@ infiles = [
     "sh_cdp_n_r2.txt",
     "sh_cdp_n_r3.txt",
 ]
+
+
+def unique_network_map(topology_dict):
+    copy_dict = topology_dict
+    dup_keys = []
+    for key1, value1 in topology_dict.items():
+        for key2, value2 in copy_dict.items():
+            if key1 == value2 and value1 == key2:
+                dup_keys.append(key1)
+    del(dup_keys[:int(len(dup_keys)/2)])
+    [topology_dict.pop(key) for key in dup_keys]
+    return topology_dict
+
+
+if __name__ == "__main__":
+    draw_topology(unique_network_map(create_network_map(infiles)), "task_11_2a_topology.svg")

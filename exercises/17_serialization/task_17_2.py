@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import re
+import csv
 """
 Задание 17.2
 
@@ -46,6 +48,30 @@
 import glob
 
 sh_version_files = glob.glob("sh_vers*")
-# print(sh_version_files)
+#print(sh_version_files)
 
 headers = ["hostname", "ios", "image", "uptime"]
+
+
+def parse_sh_version(sh_version):
+    ios = re.search(r'Cisco IOS Software,.*, Version (.*),', sh_version).group(1)
+    image = re.search(r'System image file is "(.*)"', sh_version).group(1)
+    uptime = re.search(r'uptime is (.* minutes)', sh_version).group(1)
+    cortege = (ios, image, uptime)
+    return cortege
+
+
+def write_inventory_to_csv(data_filenames, csv_filename):
+    with open(csv_filename, 'w') as wr_csv:
+        output = [headers]
+        for file in data_filenames:
+            with open(file, 'r') as f:
+                string = parse_sh_version(f.read())
+                hostname = re.search(r'sh_version_(.*)\..*', file).group(1)
+                output.append([hostname, string[0], string[1], string[2]])
+        writer = csv.writer(wr_csv)
+        for row in output:
+            writer.writerow(row)
+
+
+write_inventory_to_csv(sh_version_files, 'routers_inventory.csv')

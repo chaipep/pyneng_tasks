@@ -16,3 +16,11 @@
 """
 
 mac = "AAAA:BBBB:CCCC"
+mac=mac.split(':')
+oct1=bin(int(mac[0],16))
+oct1=oct1[2::]
+oct2=bin(int(mac[1],16))
+oct2=oct2[2::]
+oct3=bin(int(mac[2],16))
+oct3=oct3[2::]
+print('{}{}{}'.format(oct1,oct2,oct3))

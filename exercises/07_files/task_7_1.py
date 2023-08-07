@@ -14,3 +14,18 @@ Outbound Interface    FastEthernet0/0
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 """
+template = '''Prefix                {}
+AD/Metric             {}
+Next-Hop              {}
+Last update           {}
+Outbound Interface    {}'''
+
+with open('/home/yudkinds/tools/pyneng_tasks/exercises/07_files/ospf.txt', 'r') as ospf:
+    for string_num in ospf:
+        string = string_num.split()
+        string.pop(0)
+        string.pop(2)
+        string[1] = string[1].strip('[]')
+        string[2] = string[2].strip(',')
+        string[3] = string[3].strip(',')
+        print(template.format(*string))

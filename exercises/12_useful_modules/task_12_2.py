@@ -34,3 +34,35 @@
  '172.21.41.129', '172.21.41.130', '172.21.41.131', '172.21.41.132']
 
 """
+
+def convert_ranges_to_ip_list(ip_list):
+    res_ip_list = []
+    for ip in ip_list:
+        if len(ip.split('-')) > 1:
+            if len(ip.split('.')) == 4:
+                ipoct = ip.split('.')
+                start_ip = int(ipoct[3].split('-')[0])
+                stop_ip = int(ipoct[3].split('-')[1])+1
+                for ipoct4 in range(start_ip, stop_ip):
+                    res_ip_list.append(ipoct[0] + '.' + ipoct[1] + '.' + ipoct[2] + '.' + str(ipoct4))
+            else:
+                ipoct = ip.split('.')
+                start_ip = int(ipoct[3].split('-')[0])
+                stop_ip = int(ipoct[6])+1
+                for ipoct4 in range(start_ip, stop_ip):
+                    res_ip_list.append(ipoct[0] + '.' + ipoct[1] + '.' + ipoct[2] + '.' + str(ipoct4))
+        else:
+            res_ip_list.append(ip)
+    return res_ip_list
+
+
+if __name__ == "__main__":
+    ip_list = [
+        '192.168.1.1-10',
+        '100.91.0.1-100.91.0.20',
+        '100.81.0.110',
+        '100.81.0.114',
+        '10.100.105.106',
+        '100.93.0.1-30'
+    ]
+    print(tabulate(convert_ranges_to_ip_list(ip_list)))

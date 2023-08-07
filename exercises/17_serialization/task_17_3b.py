@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import graphviz
+from draw_network_graph import draw_topology
+import yaml
+
 """
 Задание 17.3b
 
@@ -43,3 +47,29 @@
 > pip install graphviz
 
 """
+
+
+def transform_topology(yaml_file):
+    with open(yaml_file) as f:
+        topo_dict = yaml.safe_load(f)
+        temp_dict = {}
+        new_dict = {}
+        for hostname, cdp_ne in topo_dict.items():
+            for local_if, remote_dev_if in cdp_ne.items():
+                key = (hostname, local_if)
+                for dev_id, remote_if in remote_dev_if.items():
+                    temp_dict[key] = (dev_id, remote_if)
+                    new_dict.update(temp_dict)
+        copy_dict = new_dict
+        dup_keys = []
+        for key1, value1 in new_dict.items():
+            for key2, value2 in copy_dict.items():
+                if key1 == value2 and value1 == key2:
+                    dup_keys.append(key1)
+        del (dup_keys[:int(len(dup_keys) / 2)])
+        [new_dict.pop(key) for key in dup_keys]
+        return new_dict
+
+
+if __name__ == "__main__":
+    draw_topology(transform_topology('topology.yaml'), 'task_17_3b_new_topology')

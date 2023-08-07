@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 """
 Задание 15.2
 
@@ -21,3 +22,19 @@
 Проверить работу функции на примере файла sh_ip_int_br.txt.
 
 """
+
+
+def parse_sh_ip_int_br(inputfile):
+    with open(inputfile, 'r') as file:
+        result = []
+        for string in file:
+            match = re.search(r'(\w+\d+\/*\d*) +(\S+) +\S+ +\S+ +(\S+ \S*) +(\S+)', string)
+            if match:
+                result.append((match.group(1),
+                               match.group(2),
+                               match.group(3).rstrip(),
+                               match.group(4)))
+    return result
+
+
+print(parse_sh_ip_int_br('sh_ip_int_br.txt'))

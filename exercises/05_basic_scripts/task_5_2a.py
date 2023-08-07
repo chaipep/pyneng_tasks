@@ -49,3 +49,37 @@ bin_ip = "00001010000000010000000111000011"
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 """
+
+ip_address = input('Введите IP адрес и маску сети в формате X.X.X.X/Y ')
+ip_list = ip_address.split('/')
+ip = (ip_list[0]).split('.')
+ip_bin_list = [bin(int(ip[0]))[2::], bin(int(ip[1]))[2::], bin(int(ip[2]))[2::], bin(int(ip[3]))[2::]]
+ip_bin_list = ['0'*(8-len(ip_bin_list[0]))+ip_bin_list[0], '0'*(8-len(ip_bin_list[1]))+ip_bin_list[1],
+          '0'*(8-len(ip_bin_list[2]))+ip_bin_list[2], '0'*(8-len(ip_bin_list[3]))+ip_bin_list[3]]
+ip_bin = ip_bin_list[0]+ip_bin_list[1]+ip_bin_list[2]+ip_bin_list[3]
+mask = int(ip_list[1])
+mask_zero = 32-mask
+mask_bin = '1'*mask+'0'*mask_zero
+mask_bin_oct = [mask_bin[0:8], mask_bin[8:16], mask_bin[16:24], mask_bin[24:32]]
+mask_dec = [int(mask_bin_oct[0], 2), int(mask_bin_oct[1], 2), int(mask_bin_oct[2], 2),
+            int(mask_bin_oct[3], 2)]
+ip_net = ip_bin[0:-mask_zero]+'0'*mask_zero
+ip_net_oct = [ip_net[0:8], ip_net[8:16], ip_net[16:24], ip_net[24:32]]
+ip_net_dec = [int(ip_net_oct[0], 2), int(ip_net_oct[1], 2), int(ip_net_oct[2], 2),
+            int(ip_net_oct[3], 2)]
+
+ip_template = '''
+
+Network:
+{0:<8}  {1:<8}  {2:<8}  {3:<8}
+{0:>08b}  {1:>08b}  {2:>08b}  {3:>08b}
+
+Mask:
+/{4}
+{5:<8}  {6:<8}  {7:<8}  {8:<8}
+{5:>08b}  {6:>08b}  {7:>08b}  {8:>08b}
+'''
+
+print(ip_template.format(int(ip_net_dec[0]), int(ip_net_dec[1]), int(ip_net_dec[2]),
+                         int(ip_net_dec[3]), mask, int(mask_dec[0]), int(mask_dec[1]),
+                         int(mask_dec[2]), int(mask_dec[3])))

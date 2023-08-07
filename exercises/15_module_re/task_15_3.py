@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 """
 Задание 15.3
 
@@ -32,3 +33,16 @@ object network LOCAL_10.1.9.5
 
 Во всех правилах для ASA интерфейсы будут одинаковыми (inside,outside).
 """
+
+
+def convert_ios_nat_to_asa(file1, file2):
+    with open(file1, 'r') as infile, open(file2, 'w') as outfile:
+        for string in infile:
+            match = re.search(r'static (\w+) (\S+) (\d+) interface \w+\d+/*\d* (\d+)', string)
+            outfile.writelines('object network LOCAL_'+match.group(2)+'\n' +
+                               ' host ' + match.group(2)+'\n' +
+                               ' nat (inside,outside) static interface service '
+                               + match.group(1)+' '+match.group(3)+' '+match.group(4)+'\n')
+
+
+convert_ios_nat_to_asa('cisco_nat_config.txt', 'asa_nat_config.txt')

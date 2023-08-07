@@ -17,3 +17,15 @@
 """
 
 ignore = ["duplex", "alias", "configuration"]
+with open('/home/yudkinds/tools/pyneng_tasks/exercises/07_files/config_sw1.txt', 'r') as config, \
+        open('/tmp/pytest-of-yudkinds/pytest-0/test_task0/test_tasks/task_7_2b.txt', 'w') as result:
+    for string in config:
+        if '!' in string:
+            continue
+        else:
+            string_ignore = False
+            for word in ignore:
+                if word in string:
+                    string_ignore = True
+            if not string_ignore:
+                result.writelines(string)

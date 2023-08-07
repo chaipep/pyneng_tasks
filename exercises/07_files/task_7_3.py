@@ -20,3 +20,10 @@
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 """
+template ='''{0:<8} {1}      {3}'''
+with open('/home/yudkinds/tools/pyneng_tasks/exercises/07_files/CAM_table.txt', 'r') as file:
+    for string in file:
+        line = string.split()
+        if len(line) != 0:
+            if line[0].isdigit():
+                print(template.format(*line))

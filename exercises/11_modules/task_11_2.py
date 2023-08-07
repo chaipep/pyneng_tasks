@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from task_11_1 import parse_cdp_neighbors
 """
 Задание 11.2
 
@@ -34,3 +35,13 @@ infiles = [
     "sh_cdp_n_r2.txt",
     "sh_cdp_n_r3.txt",
 ]
+
+def create_network_map(filenames):
+    topology = {}
+    for file in filenames:
+        with open(file) as f:
+            topology.update(parse_cdp_neighbors(f.read()))
+    return topology
+
+if __name__ == "__main__":
+    print(create_network_map(infiles))

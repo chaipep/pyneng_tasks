@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 """
 Задание 15.5
 
@@ -26,3 +27,16 @@ description Connected to SW1 port Eth 0/1
 
 Проверить работу функции на файле sh_cdp_n_sw1.txt.
 """
+
+
+def generate_description_from_cdp(cdp_file):
+    with open(cdp_file, 'r') as file:
+        result = {}
+        for line in file:
+            match = re.search(r'(\S+) +(\S+ \S+) +\d+ +.* (\w+ \d+\/\d*)$', line)
+            if match:
+                result[match.group(2)] = 'description Connected to '+match.group(1)+' port '+match.group(3)
+    return result
+
+
+print(generate_description_from_cdp('sh_cdp_n_sw1.txt'))
