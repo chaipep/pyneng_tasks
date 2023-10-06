@@ -18,6 +18,15 @@
 Указание текущего каталога, сломает работу других заданий/тестов.
 """
 import yaml
+from jinja2 import Environment, FileSystemLoader
+
+
+def generate_config(template, data_dict):
+    env = Environment(loader=FileSystemLoader(
+        "/home/yudkinds/tools/pyneng_tasks/exercises/20_jinja2"))
+    templ = env.get_template(template)
+    result = templ.render(data_dict)
+    return result
 
 
 # так должен выглядеть вызов функции

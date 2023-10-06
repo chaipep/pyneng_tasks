@@ -75,3 +75,43 @@ topology_example2 = {
     ("R1", "Eth0/4"): ("R7", "Eth0/0"),
     ("R1", "Eth0/6"): ("R9", "Eth0/0"),
 }
+
+
+class Topology:
+    def __init__(self, topo):
+        self.topo = topo
+        self.topology = self._topo_check()
+
+    def _topo_check(self):
+        topo_copy = self.topo
+        dup_keys = []
+        for key1, value1 in self.topo.items():
+            for key2, value2 in topo_copy.items():
+                if key1 == value2 and value1 == key2:
+                    dup_keys.append(key1)
+        del (dup_keys[:int(len(dup_keys) / 2)])
+        [self.topo.pop(key) for key in dup_keys]
+        return self.topo
+
+    def __iter__(self):
+        return iter(self.topology.items())
+
+    def __getitem__(self, key):
+        return self.topology[key]
+
+    def __add__(self, other):
+        topo_new = {}
+        topo_new.update(self.topology)
+        topo_new.update(other)
+        return Topology(topo_new)
+
+
+if __name__ == "__main__":
+    t1 = Topology(topology_example)
+    t2 = Topology(topology_example2)
+    t3 = t1 + t2
+    print(t1)
+    print(t1.topology)
+    print(t2.topology)
+    print(t3.topology)
+    print(t1.topology)

@@ -44,9 +44,42 @@ Out[14]: '*17:06:12.278 UTC Wed Mar 13 2019'
 In [15]: commands = ['username user5 password pass5', 'username user6 password pass6']
 
 In [16]: send_commands(r1, config=commands)
-Out[16]: 'config term\nEnter configuration commands, one per line.  End with CNTL/Z.\nR1(config)#username user5 password pass5\nR1(config)#username user6 password pass6\nR1(config)#end\nR1#'
+Out[16]: 'config term\nEnter configuration commands, one per line.  End with CNTL/Z.\nR1(config)#username user5 password
+ pass5\nR1(config)#username user6 password pass6\nR1(config)#end\nR1#'
 
 """
+from task_18_1 import send_show_command
+from task_18_2 import send_config_commands
+import yaml
+from netmiko import (ConnectHandler, NetmikoTimeoutException, NetMikoAuthenticationException)
 
-commands = ["logging 10.255.255.1", "logging buffered 20010", "no logging console"]
-command = "sh ip int br"
+
+def send_commands(device, *, show=None, config=None):
+    try:
+        result = None
+        if config is not None and show is not None:
+            raise ValueError()
+        else:
+            if show is not None:
+                result = send_show_command(device, show)
+            if config is not None:
+                result = send_config_commands(device, config)
+        return result
+    except TypeError as error:
+        print(error)
+
+
+if __name__ == "__main__":
+
+    commands = ["logging 10.255.255.1", "logging buffered 20010", "no logging console"]
+    command = "sh ip int br"
+
+    with open("devices.yaml") as f:
+        devices = yaml.safe_load(f)
+
+    for dev in devices:
+        print(send_commands(dev,
+                            show=command,
+                            config=commands,
+                            # command
+                            ))

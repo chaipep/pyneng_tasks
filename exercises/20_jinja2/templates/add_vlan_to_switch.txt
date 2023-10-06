@@ -1,0 +1,16 @@
+#Добавление VLAN
+vlan {{vlan_id}}
+name {{name}}
+
+#Для access
+{% for intf in access %}
+interface {{intf}}
+ switchport mode access
+ switchport access vlan {{vlan_id}}
+{% endfor %}
+
+#Для trunk
+{% for intf in trunk %}
+interface {{intf}}
+ switchport trunk allowed vlan add {{vlan_id}}
+{% endfor %}

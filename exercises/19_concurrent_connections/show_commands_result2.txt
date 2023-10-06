@@ -1,0 +1,88 @@
+
+R1#sh ip int br
+Interface                  IP-Address      OK? Method Status                Protocol
+Ethernet0/0                unassigned      YES NVRAM  administratively down down    
+FastEthernet1/0            192.168.100.1   YES manual up                    up      
+FastEthernet1/1            unassigned      YES unset  up                    down    
+FastEthernet1/2            unassigned      YES unset  up                    down    
+FastEthernet1/3            unassigned      YES unset  up                    down    
+FastEthernet1/4            unassigned      YES unset  up                    down    
+FastEthernet1/5            unassigned      YES unset  up                    down    
+FastEthernet1/6            unassigned      YES unset  up                    down    
+FastEthernet1/7            unassigned      YES unset  up                    down    
+FastEthernet1/8            unassigned      YES unset  up                    down    
+FastEthernet1/9            unassigned      YES unset  up                    down    
+FastEthernet1/10           unassigned      YES unset  up                    down    
+FastEthernet1/11           unassigned      YES unset  up                    down    
+FastEthernet1/12           unassigned      YES unset  up                    down    
+FastEthernet1/13           unassigned      YES unset  up                    down    
+FastEthernet1/14           unassigned      YES unset  up                    down    
+FastEthernet1/15           unassigned      YES unset  up                    down    
+Vlan1                      unassigned      YES manual up                    down    
+Loopback100                10.1.1.100      YES manual up                    up      
+R1#sh int desc
+Interface                      Status         Protocol Description
+Et0/0                          admin down     down     
+Fa1/0                          up             up       
+Fa1/1                          up             down     
+Fa1/2                          up             down     
+Fa1/3                          up             down     
+Fa1/4                          up             down     
+Fa1/5                          up             down     
+Fa1/6                          up             down     
+Fa1/7                          up             down     
+Fa1/8                          up             down     
+Fa1/9                          up             down     
+Fa1/10                         up             down     
+Fa1/11                         up             down     
+Fa1/12                         up             down     
+Fa1/13                         up             down     
+Fa1/14                         up             down     
+Fa1/15                         up             down     
+Vl1                            up             down     
+Lo100                          up             up       
+R2#sh int desc
+Interface                      Status         Protocol Description
+Et0/0                          admin down     down     
+Fa1/0                          up             up       
+Fa1/1                          up             down     
+Fa1/2                          up             down     
+Fa1/3                          up             down     
+Fa1/4                          up             down     
+Fa1/5                          up             down     
+Fa1/6                          up             down     
+Fa1/7                          up             down     
+Fa1/8                          up             down     
+Fa1/9                          up             down     
+Fa1/10                         up             down     
+Fa1/11                         up             down     
+Fa1/12                         up             down     
+Fa1/13                         up             down     
+Fa1/14                         up             down     
+Fa1/15                         up             down     
+Vl1                            up             down     
+R3#sh ip int br
+Interface                  IP-Address      OK? Method Status                Protocol
+Ethernet0/0                unassigned      YES NVRAM  administratively down down    
+FastEthernet1/0            192.168.100.3   YES NVRAM  up                    up      
+FastEthernet1/1            unassigned      YES unset  up                    down    
+FastEthernet1/2            unassigned      YES unset  up                    down    
+FastEthernet1/3            unassigned      YES unset  up                    down    
+FastEthernet1/4            unassigned      YES unset  up                    down    
+FastEthernet1/5            unassigned      YES unset  up                    down    
+FastEthernet1/6            unassigned      YES unset  up                    down    
+FastEthernet1/7            unassigned      YES unset  up                    down    
+FastEthernet1/8            unassigned      YES unset  up                    down    
+FastEthernet1/9            unassigned      YES unset  up                    down    
+FastEthernet1/10           unassigned      YES unset  up                    down    
+FastEthernet1/11           unassigned      YES unset  up                    down    
+FastEthernet1/12           unassigned      YES unset  up                    down    
+FastEthernet1/13           unassigned      YES unset  up                    down    
+FastEthernet1/14           unassigned      YES unset  up                    down    
+FastEthernet1/15           unassigned      YES unset  up                    down    
+Vlan1                      unassigned      YES NVRAM  up                    down    
+R3#sh ip route | ex -
+
+Gateway of last resort is not set
+
+C    192.168.100.0/24 is directly connected, FastEthernet1/0

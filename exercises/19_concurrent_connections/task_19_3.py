@@ -42,8 +42,36 @@ router ospf 1
 
 # Этот словарь нужен только для проверки работа кода, в нем можно менять IP-адреса
 # тест берет адреса из файла devices.yaml
-commands = {
-    "192.168.100.3": "sh run | s ^router ospf",
-    "192.168.100.1": "sh ip int br",
-    "192.168.100.2": "sh int desc",
-}
+
+
+from concurrent.futures import ThreadPoolExecutor
+import yaml
+import netmiko
+from netmiko import (ConnectHandler, NetmikoTimeoutException, NetMikoAuthenticationException)
+
+
+def send_command_to_devices(devices, commands_dict, filename, limit):
+    with ThreadPoolExecutor(max_workers=limit):
+        result = []
+        for dev in devices:
+            with netmiko.ConnectHandler(**dev) as ssh:
+                ssh.enable()
+                result.append('\n' + ssh.find_prompt() + commands_dict[dev["host"]] + '\n')
+                result.append(ssh.send_command(commands_dict[dev["host"]]))
+        with open(filename, 'w') as file:
+            for string in result:
+                file.write(string)
+
+
+if __name__ == "__main__":
+    name = "show_commands_result.txt"
+    threads = 5
+    commands = {
+        "192.168.100.3": "sh run | s ^router ospf",
+        "192.168.100.1": "sh ip int br",
+        "192.168.100.2": "sh int desc",
+    }
+
+    with open("devices.yaml") as f:
+        device_list = yaml.safe_load(f)
+    send_command_to_devices(device_list, commands, name, threads)

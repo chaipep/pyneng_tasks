@@ -63,3 +63,107 @@ ValueError                                Traceback (most recent call last)
 ValueError: При выполнении команды "logging 0255.255.1" на устройстве 192.168.100.1 возникла ошибка -> Invalid input detected at '^' marker.
 
 """
+
+from telnetlib import Telnet
+from textfsm import TextFSM, clitable
+from time import sleep
+
+
+class CiscoTelnet:
+    def __init__(self, ip, username, password, secret):
+        self.ip = ip
+        self.con = Telnet(ip, 23, 10)
+        self.con.read_until(b'Username: ')
+        self._write_line(username)
+        self.con.read_until(b'Password: ')
+        self._write_line(password)
+        self.con.expect([b'[>#]'])
+        self._write_line('enable')
+        self.con.read_until(b'Password: ')
+        self._write_line(secret)
+        self.con.expect([b'[#]'])
+        self._write_line('terminal length 0')
+        self.con.expect([b'[#]'])
+
+    def _write_line(self, line):
+        self.con.write(line.encode('ascii') + b'\n')
+
+    def send_config_commands(self, commands, strict=True):
+        self._write_line('conf t')
+        self.con.expect([b'[#]'])
+        if isinstance(commands, str):
+            self._write_line('\n')
+            self._write_line(commands)
+            sleep(1)
+            output = self.con.read_very_eager().decode('utf-8')
+            clear_output = '\n'.join(output.split('\n')[2:-1])
+            if '%' in output:
+                error = output.split('% ')[-1].split('\n')[0]
+                if strict:
+                    raise ValueError('При выполнении команды "' + commands +
+                                     '" на устройстве ' + self.ip + ' возникла ошибка -> ' + error)
+                else:
+                    print('При выполнении команды "' + commands +
+                          '" на устройстве ' + self.ip + ' возникла ошибка -> ' + error)
+                    return clear_output
+            else:
+                return clear_output
+        else:
+            result_list = []
+            errors_list = []
+            for command in commands:
+                self._write_line('\n')
+                self._write_line(command)
+                sleep(1)
+                output = self.con.read_very_eager().decode('utf-8')
+                clear_output = '\n'.join(output.split('\n')[2:-1])
+                if '%' in output:
+                    error = output.split('% ')[-1].split('\n')[0]
+                    if strict:
+                        raise ValueError('При выполнении команды "' + command +
+                                         '" на устройстве ' + self.ip + ' возникла ошибка -> ' + error)
+                    else:
+                        errors_list.append('При выполнении команды "' + command +
+                                           '" на устройстве ' + self.ip + ' возникла ошибка -> ' + error)
+                        result_list.append(clear_output)
+                else:
+                    result_list.append(clear_output)
+            return '\n'.join(errors_list) + '\n' + '\n'.join(result_list)
+
+    def send_show_command(self, command, parse=True, templates='templates', index='index'):
+        self._write_line(command)
+        attributes_dict = {'Command': command, 'Vendor': 'cisco_ios'}
+        output = self.con.read_until(b'#').decode('utf-8')
+        if parse:
+            cli_table = clitable.CliTable(index, templates)
+            cli_table.ParseCmd(output, attributes_dict)
+            header = list(cli_table.header)
+            result = [list(row) for row in cli_table]
+            result_list = []
+            for value in result:
+                res_dict = {}
+                for key, item in zip(header, value):
+                    res_dict[key] = item
+                result_list.append(res_dict)
+            return result_list
+        else:
+            return output
+
+
+if __name__ == "__main__":
+
+    r1_params = {
+        'ip': '192.168.100.1',
+        'username': 'cisco',
+        'password': 'cisco',
+        'secret': 'cisco'}
+    com = 'sh ip int br'
+    # coms = ['int Fa1/15', 'speed 100', 'duplex full', 'exit', 'd0o sh run int Fa1/15']
+    # coms = 'do sh ip int br'
+    commands_with_errors = ['logging 0255.255.1', 'logging', 'a']
+    correct_commands = ['logging buffered 20010', 'ip http server']
+    commands_list = commands_with_errors + correct_commands
+    # commands_list = 'a'
+    r1 = CiscoTelnet(**r1_params)
+    # print(r1.send_show_command(com))
+    print(r1.send_config_commands(commands_list))

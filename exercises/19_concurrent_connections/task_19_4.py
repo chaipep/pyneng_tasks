@@ -105,3 +105,56 @@ R3#
 
 Для выполнения задания можно создавать любые дополнительные функции.
 """
+
+from concurrent.futures import ThreadPoolExecutor
+import yaml
+import netmiko
+from netmiko import (ConnectHandler, NetmikoTimeoutException, NetMikoAuthenticationException)
+
+
+def send_show_command(device, command):
+    with ConnectHandler(**device) as ssh:
+        ssh.enable()
+        result = '\n' + ssh.find_prompt() + command + '\n' + ssh.send_command(command)
+    return result
+
+
+def send_config_commands(device, command):
+    try:
+        with (ConnectHandler(**device) as ssh):
+            ssh.enable()
+            result = ssh.send_config_set(command)
+        return result
+    except (NetMikoAuthenticationException, NetmikoTimeoutException) as error:
+        print(error)
+
+
+def send_commands_to_devices(devices, filename, *, show=None, config=None, limit=3):
+    with ThreadPoolExecutor(max_workers=limit):
+        try:
+            result = []
+            for device in devices:
+                if config is not None and show is not None:
+                    raise ValueError()
+                else:
+                    if show is not None:
+                        result.append(send_show_command(device, show))
+                    if config is not None:
+                        result.append(send_config_commands(device, config))
+                print(result)
+                with open(filename, 'w') as file:
+                    for string in result:
+                        file.write(string)
+        except TypeError as error:
+            print(error)
+
+
+if __name__ == "__main__":
+    name = "show_commands_result.txt"
+    threads = 5
+    show_com = "sh clock"
+    commands = ["int fa1/2", "switchport", "switchport mode access", "switchport access vlan 2"]
+
+    with open("devices.yaml") as f:
+        device_list = yaml.safe_load(f)
+    send_commands_to_devices(device_list, name, show=None, config=commands, limit=threads)

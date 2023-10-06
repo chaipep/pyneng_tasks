@@ -38,10 +38,64 @@
 Они должны быть, но тест упрощен, чтобы было больше свободы выполнения.
 """
 
-data = {
-    "tun_num": None,
-    "wan_ip_1": "192.168.100.1",
-    "wan_ip_2": "192.168.100.2",
-    "tun_ip_1": "10.0.1.1 255.255.255.252",
-    "tun_ip_2": "10.0.1.2 255.255.255.252",
-}
+import yaml
+from jinja2 import Environment, FileSystemLoader
+from task_20_5 import create_vpn_config
+from netmiko import (ConnectHandler, NetmikoTimeoutException, NetMikoAuthenticationException)
+import re
+from time import time
+
+
+def configure_vpn(src_device_params, dst_device_params,
+                  src_template, dst_template, vpn_data_dict):
+    try:
+        device_list = [src_device_params, dst_device_params]
+        tunnels = []
+        for dev in device_list:
+            with ConnectHandler(**dev) as ssh:
+                ssh.enable()
+                show = ssh.send_command('sh run | include Tunnel')
+                if show:
+                    for string in show.split('\n'):
+                        tun = re.search(r'\d+', string).group(0)
+                        tunnels.append(int(tun))
+        tunnels = list(set(tunnels))
+        if tunnels:
+            for i in range(4097):
+                if i not in tunnels:
+                    vpn_data_dict["tun_num"] = i
+                    break
+        else:
+            vpn_data_dict["tun_num"] = 0
+        commands = create_vpn_config(src_template, dst_template, vpn_data_dict)
+        print('------------------------------------------------------------')
+        with ConnectHandler(**src_device_params) as ssh:
+            ssh.enable()
+            srs_result = ssh.send_config_set(commands[0].split('\n'))
+        print(srs_result)
+        print('------------------------------------------------------------')
+        with ConnectHandler(**dst_device_params) as ssh:
+            ssh.enable()
+            dst_result = ssh.send_config_set(commands[1].split('\n'))
+        print(dst_result)
+        print('------------------------------------------------------------')
+        return srs_result, dst_result
+    except TypeError as error:
+        print(error)
+
+
+if __name__ == "__main__":
+    with open("devices.yaml") as f:
+        devices = yaml.safe_load(f)
+    data = {
+        "tun_num": None,
+        "wan_ip_1": "192.168.100.1",
+        "wan_ip_2": "192.168.100.2",
+        "tun_ip_1": "10.0.1.1 255.255.255.252",
+        "tun_ip_2": "10.0.1.2 255.255.255.252",
+    }
+    src_device = devices[0]
+    dst_device = devices[1]
+    template_file1 = "templates/gre_ipsec_vpn_1.txt"
+    template_file2 = "templates/gre_ipsec_vpn_2.txt"
+    print(configure_vpn(src_device, dst_device, template_file1, template_file2, data))

@@ -50,8 +50,51 @@ In [12]: pprint(result)
 
 """
 
-# списки команд с ошибками и без:
-commands_with_errors = ["logging 0255.255.1", "logging", "a"]
-correct_commands = ["logging buffered 20010", "ip http server"]
+import re
+import yaml
+from re import search
+from pprint import pprint
+from netmiko import (ConnectHandler, NetmikoTimeoutException, NetMikoAuthenticationException)
 
-commands = commands_with_errors + correct_commands
+
+def send_config_commands(device, config_commands, log=True):
+    try:
+        with ConnectHandler(**device) as ssh:
+            good = {}
+            bad = {}
+            ssh.enable()
+            if log:
+                print('Подключаюсь к ' + device['host'] + '...')
+            for command in config_commands:
+                result = ssh.send_config_set(command)
+                if '%' in result:
+                    error = re.search('(?<=% ).*', result).group()
+                    print('Команда "' + command + '" выполнилась с ошибкой "'
+                          + error + '" на устройстве ' + device['host'])
+                    bad[command] = result
+                    key = input('Продолжать выполнять команды? [y]/n: ')
+                    print(key)
+                    if key == ('n' or 'no'):
+                        break
+                    else:
+                        continue
+                else:
+                    good[command] = result
+
+            result = (good, bad)
+        return result
+    except (NetMikoAuthenticationException, NetmikoTimeoutException) as error:
+        print(error)
+
+
+if __name__ == "__main__":
+    commands_with_errors = ["logging 0255.255.1", "logging", "a"]
+    correct_commands = ["logging buffered 20010", "ip http server"]
+
+    commands = commands_with_errors + correct_commands
+
+    with open("devices.yaml") as f:
+        devices = yaml.safe_load(f)
+
+    for dev in devices:
+        pprint(send_config_commands(dev, commands, log=True), width=120)
