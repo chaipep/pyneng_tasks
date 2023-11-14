@@ -25,8 +25,10 @@ from datetime import datetime, timedelta
 
 now = datetime.today().replace(microsecond=0)
 week_ago = now - timedelta(days=7)
+old = '2023-10-31 16:04:38'
 
-# print(now)
-# print(week_ago)
-# print(now > week_ago)
-# print(str(now) > str(week_ago))
+print(now)
+print(week_ago)
+print(now > week_ago)
+print(str(now) > str(week_ago))
+print(str(old) < str(week_ago))

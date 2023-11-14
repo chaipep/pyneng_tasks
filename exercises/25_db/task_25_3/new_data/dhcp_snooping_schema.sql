@@ -11,6 +11,5 @@ create table dhcp (
     vlan         text,
     interface    text,
     switch       text not null references switches(hostname),
-    active       integer,
-    last_active  text
+    active       text
 );

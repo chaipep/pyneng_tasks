@@ -25,6 +25,13 @@ Out[4]: 'Interface                  IP-Address      OK? Method Status           
 from netmiko.cisco.cisco_ios import CiscoIosSSH
 
 
+class MyNetmiko(CiscoIosSSH):
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.enable()
+
+
+
 device_params = {
     "device_type": "cisco_ios",
     "ip": "192.168.100.1",
@@ -32,3 +39,8 @@ device_params = {
     "password": "cisco",
     "secret": "cisco",
 }
+
+if __name__ == "__main__":
+    r1 = MyNetmiko(**device_params)
+    print('enable_mode', r1.check_enable_mode())
+    print(r1.send_command('sh run | in hostname'))
